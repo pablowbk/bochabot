@@ -1,7 +1,6 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrCode = require('qrcode-terminal');
-const { getSheetData } = require('./sheets-api');
-const { commands, getTable } = require('./commands');
+const { commands } = require('./commands');
 
 const IS_PROD = process.env.ENV === 'prod';
 const test_text = '[Test] ';
@@ -31,12 +30,13 @@ client.on('message_create', async message => {
   const command = message.body.trim().toLowerCase();
 
   if (commands[command]) {
-    await commands[command](message, IS_PROD);
+    console.log(`Executing command: ${command}`);
+    await commands[command].fn(message, IS_PROD, client);
   } else {
     console.log({ command });
-    await chat.sendMessage(
+    await message.reply(
       (IS_PROD ? '' : test_text) +
-        'No entiendo ese comando. Envía !ayuda para ver una lista de comandos disponibles.'
+      'No entiendo ese comando.\nEnvía *AYUDA* para ver una lista de comandos disponibles.'
     );
   }
 });

@@ -1,7 +1,6 @@
 const { google } = require('googleapis');
 const sheets = google.sheets('v4');
 require('dotenv').config();
-// console.log('credentials', process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS)
 const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS);
 
 
@@ -19,7 +18,12 @@ async function getSheetData(range) {
   };
 
   const response = await sheets.spreadsheets.values.get(request);
-  return response.data.values;
+  const rows = response.data.values;
+  if (rows.length) {
+    return rows.map(row => row.join(' | ')).join('\n');
+  } else {
+    return 'No data found.';
+  }
 }
 
 module.exports = {
