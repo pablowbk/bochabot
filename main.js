@@ -10,7 +10,7 @@ const client = new Client({
   authStrategy: new LocalAuth()
 });
 
-client.on('qr', (qr) => {
+client.on('qr', qr => {
   qrCode.generate(qr, { small: true });
 });
 
@@ -22,15 +22,22 @@ client.on('message_create', async message => {
   const chat = await message.getChat();
   if (chat.name !== 'BochaBot') return;
 
-  if (!IS_PROD && message.body.startsWith(test_text.trim())) return; // debug TEST
+  if (!IS_PROD && message.body.startsWith(test_text.trim())) {
+    console.log('deberías obviar esto');
+    return;
+  } // debug TEST
 
-  console.log('chat', chat)
+  console.log('chat', chat);
   const command = message.body.trim().toLowerCase();
 
   if (commands[command]) {
     await commands[command](message, IS_PROD);
   } else {
-    await chat.sendMessage((IS_PROD ? '' : test_text) + 'No entiendo ese comando. Envía !ayuda para ver una lista de comandos disponibles.');
+    console.log({ command });
+    await chat.sendMessage(
+      (IS_PROD ? '' : test_text) +
+        'No entiendo ese comando. Envía !ayuda para ver una lista de comandos disponibles.'
+    );
   }
 });
 
