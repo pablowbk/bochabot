@@ -1,9 +1,13 @@
+const express = require('express');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrCode = require('qrcode-terminal');
 const { commands } = require('./commands');
 
 const IS_PROD = process.env.ENV === 'prod';
 const test_text = '[Test] ';
+
+const app = express();
+const port = process.env.PORT || 3000;
 
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -45,3 +49,12 @@ client.on('message_create', async message => {
 });
 
 client.initialize();
+
+// Agrega un endpoint básico para que Heroku mantenga la aplicación activa
+app.get('/', (req, res) => {
+  res.send('WhatsApp Bot is running');
+});
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
